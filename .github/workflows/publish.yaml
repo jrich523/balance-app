@@ -43,8 +43,13 @@ jobs:
           REPOSITORY: balance-app
           IMAGE_TAG: ${{ github.sha }}
         run: |
-          docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
-          docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
+          if docker pull $REGISTRY/$REPOSITORY:$IMAGE_TAG; then
+            echo "Image already exists in the registry. Skipping build and push."
+          else
+            echo "Image not found in registry. Building and pushing..."
+            docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
+            docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
+          fi
 
       - name: Terragrunt init
         working-directory: ./infra
