@@ -32,14 +32,28 @@ def get_address_balance(address):
     try:
         float_value = float(balance)
         return jsonify({'balance': balance})
-    except ValueError:
+    except Exception:
         return jsonify({'error': balance})
 
 
+@app.route('/hashaddress/<address>', methods=['GET'])
+def get_hash_address(address):
+    '''Query based on a hash'''
+    
+    data = {
+        "jsonrpc": "2.0",
+        "method": "eth_getTransactionByHash",
+        "params": [address],
+        "id": 1
+    }
+    
+    response = query_infura(data)
+    
+    return response.json()
+        
+
 def get_eth_balance(address, block='latest'):
     '''Query Infura for Eth balance'''
-
-    headers = {"Content-Type": "application/json"}
 
     data = {
         "jsonrpc": "2.0",
@@ -47,13 +61,9 @@ def get_eth_balance(address, block='latest'):
         "params": [address, block],
         "id": 1
     }
-
-    url = urljoin(INFURA_API_ENDPOINT, API_KEY)
-
-    response = requests.post(url, headers=headers, data=json.dumps(data), timeout=60)
-
-    logger.debug("Status: %s Response: %s", response.status_code, response.json())
-
+    
+    response = query_infura(data)
+    
     if response.status_code == 200:
         body = response.json()
         if 'error' in body:
@@ -66,7 +76,13 @@ def get_eth_balance(address, block='latest'):
 
     return balance
 
-
+def query_infura(body):
+    headers = {"Content-Type": "application/json"}
+    url = urljoin(INFURA_API_ENDPOINT, API_KEY)
+    response = requests.post(url, headers=headers, data=json.dumps(body), timeout=60)
+    logger.debug("Infura Query Response: %s", response)
+    return response
+    
 def wei_to_eth(wei):
     '''convert wei to eth'''
     balance = Web3.from_wei(int(wei, 16), 'ether')
