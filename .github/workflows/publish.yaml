@@ -29,7 +29,7 @@ jobs:
         with:
           role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/$${{ secrets.ROLE_TO_ASSUME }}
           role-session-name: Infra_RunTerraform
-          aws-region: ${{ env.AWS_REGION }}
+          aws-region: us-east-1
       
       - name: ECR Login
         id: login-ecr
