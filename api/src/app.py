@@ -8,7 +8,6 @@ import os
 import sys
 import logging
 from urllib.parse import urljoin
-from decimal import Decimal
 import requests
 from web3 import Web3
 from flask import Flask, jsonify
@@ -29,9 +28,10 @@ def get_address_balance(address):
     '''route to GET an eth balance based on the address'''
 
     balance = get_eth_balance(address)
-    if isinstance(balance, (int, Decimal)):
+    try:
+        float_value = float(balance)
         return jsonify({'balance': balance})
-    else:
+    except ValueError:
         return jsonify({'error': balance})
 
 
