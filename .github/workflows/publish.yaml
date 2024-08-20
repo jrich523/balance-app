@@ -8,6 +8,9 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
     env:
       TF_VAR_version: "${{ github.sha }}"
       TTF_VAR_api_key: "${{ secrets.API_KEY }}"
@@ -16,8 +19,6 @@ jobs:
     steps:
       - name: Check Out Code
         uses: actions/checkout@v4
-
-      
 
       - name: Setup Terragrunt
         uses: autero1/action-terragrunt@v3
