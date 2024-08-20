@@ -28,7 +28,7 @@ resource "aws_iam_role" "ecs_role" {
   })
 
   inline_policy {
-    name        = "app_ecs_policy"
+    name = "app_ecs_policy"
 
     policy = jsonencode({
       "Version" : "2012-10-17",
@@ -48,19 +48,19 @@ resource "aws_iam_role" "ecs_role" {
           ]
         },
         {
-        Effect   = "Allow"
-        Action   = [
-          "ecr:GetDownloadUrlForLayer",
-          "ecr:BatchGetImage",
-          "ecr:BatchCheckLayerAvailability"
-        ]
-        Resource = "arn:aws:ecr:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:repository/*"
-      },
-      {
-        Effect   = "Allow"
-        Action   = "ecr:GetAuthorizationToken"
-        Resource = "*"
-      }
+          Effect = "Allow"
+          Action = [
+            "ecr:GetDownloadUrlForLayer",
+            "ecr:BatchGetImage",
+            "ecr:BatchCheckLayerAvailability"
+          ]
+          Resource = "arn:aws:ecr:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:repository/*"
+        },
+        {
+          Effect   = "Allow"
+          Action   = "ecr:GetAuthorizationToken"
+          Resource = "*"
+        }
       ]
     })
   }
@@ -107,15 +107,15 @@ locals {
   app_endpoint = aws_lb.app_nlb.dns_name
   container_definition = [
     {
-      name = "balance-app-container"
-      memory = 100
-      image        = "${data.aws_caller_identity.current.account_id}.dkr.ecr.${data.aws_region.current.name}.amazonaws.com/balance-app:${var.app_version}"
-      essential    = true
+      name      = "balance-app-container"
+      memory    = 100
+      image     = "${data.aws_caller_identity.current.account_id}.dkr.ecr.${data.aws_region.current.name}.amazonaws.com/balance-app:${var.app_version}"
+      essential = true
       portMappings = [
         {
-          "containerPort":5000,
-          "hostPort":5000
-        }    
+          "containerPort" : 5000,
+          "hostPort" : 5000
+        }
       ]
       secrets = [
         {

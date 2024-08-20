@@ -1,6 +1,6 @@
 
 resource "aws_ecs_cluster" "app_cluster" {
-  name  = "app_cluster"
+  name = "app_cluster"
 }
 
 resource "aws_ecs_cluster_capacity_providers" "app_capacity_provider" {
@@ -20,7 +20,7 @@ resource "aws_security_group" "app_sg" {
   description = "Allow inbound access to app ports"
 
   vpc_id = var.vpc_id
-  
+
   ingress {
     from_port   = 5000
     to_port     = 5000
@@ -38,10 +38,10 @@ resource "aws_security_group" "app_sg" {
 }
 
 resource "aws_lb" "app_nlb" {
-  name                             = "app-nlb"
-  load_balancer_type               = "network"
-  internal                         = false
-  subnets                          = var.subnets
+  name               = "app-nlb"
+  load_balancer_type = "network"
+  internal           = false
+  subnets            = var.subnets
 }
 
 resource "aws_lb_listener" "app_listener" {
