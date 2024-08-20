@@ -12,11 +12,12 @@ import requests
 from web3 import Web3
 from flask import Flask, jsonify
 
-
+## Setup Logging
 log_level = os.getenv('LOG_LEVEL', 'INFO').upper()
 logging.basicConfig(level=getattr(logging, log_level, logging.INFO))
 logger = logging.getLogger(__name__)
 
+# Environment variable for Infura access
 API_KEY = os.getenv('INFURA_API_KEY')
 INFURA_API_ENDPOINT = os.getenv('INFURA_API_ENDPOINT', "https://mainnet.infura.io/v3/")
 
