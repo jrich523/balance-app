@@ -1,0 +1,76 @@
+name: Terragrunt workflow
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      TF_VAR_version: "${{ github.sha }}"
+      TTF_VAR_api_key: "${{ secrets.API_KEY }}"
+      TF_VAR_vpc_id: "${{ secrets.VPC_ID }}"
+      TF_VAR_subnets: "${{ secrets.SUBNETS }}"
+    steps:
+      - name: Check Out Code
+        uses: actions/checkout@v4
+
+      
+
+      - name: Setup Terragrunt
+        uses: autero1/action-terragrunt@v3
+        with:
+          terragrunt-version: 0.54.12
+
+      - name: Configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/$${{ secrets.ROLE_TO_ASSUME }}
+          role-session-name: Infra_RunTerraform
+          aws-region: ${{ env.AWS_REGION }}
+      
+      - name: ECR Login
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and push image
+        working-directory: ./api
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          REPOSITORY: balance-app
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
+          docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
+
+      - name: Terragrunt init
+        working-directory: ./infra
+        shell: bash
+        run: |
+          terragrunt run-all init --terragrunt-non-interactive
+
+      - name: Terragrunt validate
+        working-directory: ./infra
+        shell: bash
+        run: |
+          terragrunt run-all validate --terragrunt-non-interactive
+
+      - name: Terragrunt format
+        working-directory: ./infra
+        shell: bash
+        run: |
+          terragrunt run-all fmt -check -diff -recursive --terragrunt-non-interactive
+
+      - name: Terragrunt plan
+        working-directory: ./infra
+        shell: bash
+        run: |
+          terragrunt run-all plan --terragrunt-non-interactive
+
+      - name: Terragrunt apply
+        working-directory: ./infra
+        shell: bash
+        run: |
+          terragrunt run-all apply --terragrunt-non-interactive
