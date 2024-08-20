@@ -13,7 +13,7 @@ jobs:
       contents: read
     env:
       TF_VAR_version: "${{ github.sha }}"
-      TT_VAR_api_key: "${{ secrets.API_KEY }}"
+      TF_VAR_api_key: "${{ secrets.API_KEY }}"
       TF_VAR_vpc_id: "${{ secrets.VPC_ID }}"
       TF_VAR_subnets: "${{ secrets.SUBNETS }}"
     steps:
